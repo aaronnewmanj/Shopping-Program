@@ -1,8 +1,6 @@
 # Amazon Product Scraper with SQL Storage
 
-This program safely scrapes thoough amazon.com for desired product and stores them in a MySQL database, with user determined order. It follows amazon guidelines and restrictions for safe and legal scraping. 
-
-## Setup
+This program scrapes thoough amazon.com for desired product and stores them in a MySQL database, with user determined list size and order based on price or rating. 
 
 1. Clone the repo:
    git clone https://github.com/aaronnewmanj/Shopping-Program.git
