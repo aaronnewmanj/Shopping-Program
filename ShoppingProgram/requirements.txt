@@ -1,0 +1,5 @@
+mysql-connector-python
+requests
+beautifulsoup4
+lxml
+python-dotenv
