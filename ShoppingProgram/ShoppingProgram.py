@@ -1,13 +1,11 @@
 import os
-import time
-import base64
 from dotenv import load_dotenv
 import mysql.connector as sqlconn
 import requests
 
-load_dotenv()
+load_dotenv()  # Loads the user's database credentials
 
-# CONFIGURATION
+# ---------- CONFIG ----------
 DB = {
     "host": os.getenv("DB_HOST", "127.0.0.1"),
     "user": os.getenv("DB_USER", "root"),
@@ -15,14 +13,14 @@ DB = {
     "database": os.getenv("DB_NAME", "ListingDatabase"),
 }
 
-EBAY_CLIENT_ID = os.getenv("EBAY_CLIENT_ID")
-EBAY_CLIENT_SECRET = os.getenv("EBAY_CLIENT_SECRET")
+# Your token proxy server URL
+TOKEN_PROXY_URL = os.getenv("EBAY_TOKEN_PROXY_URL", "https://ShoppingProgram.com/get-ebay-token")
 EBAY_USE_SANDBOX = os.getenv("EBAY_USE_SANDBOX", "false").lower() in ("1", "true", "yes")
 
-IDENTITY_URL = "https://api.sandbox.ebay.com/identity/v1/oauth2/token" if EBAY_USE_SANDBOX else "https://api.ebay.com/identity/v1/oauth2/token"
+# Browse API endpoint
 BROWSE_SEARCH_URL = "https://api.sandbox.ebay.com/buy/browse/v1/item_summary/search" if EBAY_USE_SANDBOX else "https://api.ebay.com/buy/browse/v1/item_summary/search"
 
-# DB SETUP 
+# ---------- DB SETUP ----------
 db = sqlconn.connect(
     host=DB["host"],
     user=DB["user"],
@@ -38,7 +36,7 @@ curs.execute(f"""
         Ranking INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
         Product VARCHAR(255),
         Price DOUBLE,
-        SellerRating DOUBLE,
+        SellerRating DECIMAL(3,2),
         Link TEXT
     );
 """)
@@ -50,7 +48,7 @@ add_product = f"INSERT INTO {table_name} (product, price, SellerRating, link) VA
 curs.execute(delete_all)
 db.commit()
 
-# USER INPUT 
+# ---------- USER INPUT ----------
 product_name = input("What are you shopping for? ").strip()
 if not product_name:
     print("No product provided. Exiting.")
@@ -64,40 +62,16 @@ except Exception:
     print("Invalid number, defaulting to 10.")
     product_max = 10
 
-# EBAY OAUTH 
-_token_cache = {"token": None, "expires_at": 0}
-
+# ---------- EBAY TOKEN ----------
 def get_ebay_app_token():
-    now = int(time.time())
-    if _token_cache["token"] and now < _token_cache["expires_at"] - 30:
-        return _token_cache["token"]
-
-    if not EBAY_CLIENT_ID or not EBAY_CLIENT_SECRET:
-        raise RuntimeError("EBAY_CLIENT_ID and EBAY_CLIENT_SECRET must be set in the environment.")
-
-    creds = base64.b64encode(f"{EBAY_CLIENT_ID}:{EBAY_CLIENT_SECRET}".encode()).decode()
-    headers = {
-        "Authorization": f"Basic {creds}",
-        "Content-Type": "application/x-www-form-urlencoded"
-    }
-    data = {
-        "grant_type": "client_credentials",
-        "scope": "https://api.ebay.com/oauth/api_scope"
-    }
-
-    resp = requests.post(IDENTITY_URL, headers=headers, data=data, timeout=15)
+    """
+    Requests an access token from the token proxy server.
+    """
+    resp = requests.get(TOKEN_PROXY_URL, timeout=10)
     resp.raise_for_status()
-    j = resp.json()
-    token = j.get("access_token")
-    expires_in = int(j.get("expires_in", 0))
-    if not token:
-        raise RuntimeError(f"Failed to obtain eBay token: {j}")
+    return resp.json()["access_token"]
 
-    _token_cache["token"] = token
-    _token_cache["expires_at"] = now + expires_in
-    return token
-
-# SEARCH & PARSE 
+# ---------- SEARCH & PARSE ----------
 def search_ebay_items(query, limit=20):
     token = get_ebay_app_token()
     headers = {
@@ -118,30 +92,34 @@ def search_ebay_items(query, limit=20):
     items = []
     summaries = data.get("itemSummaries", []) or []
     for item in summaries[:limit]:
+        # Title
         title = item.get("title", "")[:255]
 
+        # Price
         price_obj = item.get("price") or item.get("minPrice") or {}
-        price_val = price_obj.get("value") or price_obj.get("price") or None
+        price_val = price_obj.get("value") or price_obj.get("price") or 0
         try:
-            price = float(price_val) if price_val is not None else 0.0
+            price = float(price_val)
         except Exception:
             price = 0.0
 
+        # Seller Rating
         seller_rating = 0.0
-        seller = item.get("seller")
-        if seller and seller.get("feedbackPercentage") is not None:
-            try:
-                seller_rating = round(float(seller.get("feedbackPercentage")), 1)
-            except Exception:
-                seller_rating = 0.0
+        try:
+            r = item.get("seller", {}).get("feedbackPercentage")
+            if r is not None:
+                seller_rating = float(r)
+        except Exception:
+            seller_rating = 0.0
 
+        # Item URL
         link = item.get("itemWebUrl") or item.get("itemHref") or ""
 
         items.append((title, price, seller_rating, link))
 
     return items
 
-# SORTING 
+# ---------- SORTING ----------
 def sort_results(results):
     prompt = (
         "How do you want to sort the data?\n"
@@ -166,21 +144,20 @@ def sort_results(results):
     elif sort_choice == 4:
         return sorted(results, key=lambda x: x[2], reverse=True)
     else:
-        print("Unknown choice, returning unsorted results.")
         return results
 
-# DISPLAY 
+# ---------- DISPLAY ----------
 def display_results(results):
     for i, item in enumerate(results, start=1):
         print("")
         print(f"#{i}")
-        print(f"Title       : {item[0]}")
-        print(f"Price       : ${item[1]}")
-        print(f"SellerRating: {item[2]}%")
-        print(f"Link        : {item[3]}")
+        print(f"Title : {item[0]}")
+        print(f"Price : {item[1]}")
+        print(f"SellerRating: {item[2]}")
+        print(f"Link  : {item[3]}")
         print("")
 
-
+# ---------- MAIN FLOW ----------
 if __name__ == "__main__":
     try:
         raw_items = search_ebay_items(product_name, limit=product_max)
