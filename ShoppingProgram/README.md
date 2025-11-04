@@ -41,6 +41,8 @@ Note: Users do not need eBay API keys as the program uses a secure token proxy I
 
 **4. Run the program**
 
+The final results will take some time to load, since it uses a free public server that sleeps after inactivity (about 50 seconds). Run:
+
 python ShoppingProgram.py
 
 or
@@ -59,6 +61,8 @@ Price descending
 Seller rating ascending
 
 Seller rating descending
+
+
 
 
 
