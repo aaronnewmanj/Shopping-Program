@@ -4,16 +4,24 @@ This is a Python based eBay product scraper that fetches desired product details
 
 # Setup Instructions
 1. Clone the repository
+
 git clone https://github.com/aaronnewmanj/Shopping-Program.git
+
 cd Shopping-Program
+
 cd ShoppingProgram
 
-2. Install Dependencies
+
+3. Install Dependencies
+
 pip install -r requirements.txt
+
 or
+
 pip3 install -r requirements.txt
 
-3. Configure Database
+
+5. Configure Database
 
 Create a .env file in the project folder (copy example below) and fill in your own database credentials:
 
@@ -45,8 +53,11 @@ Then you can choose how many products to fetch.
 Finally, choose how to sort the results:
 
 Price ascending
+
 Price descending
+
 Seller rating ascending
+
 Seller rating descending
 
 
