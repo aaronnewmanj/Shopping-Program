@@ -18,16 +18,23 @@ pip3 install -r requirements.txt
 Create a .env file in the project folder (copy example below) and fill in your own database credentials:
 
 DB_HOST=127.0.0.1
+
 DB_USER=root
+
 DB_PASSWORD=yourpassword
+
 DB_NAME=ListingDatabase
+
 EBAY_TOKEN_PROXY_URL=https://shopping-program.onrender.com/get-ebay-token
 
 Note: Users do not need eBay API keys as the program uses a secure token proxy I created seperately.
 
 5. Run the program
+
 python ShoppingProgram.py
+
 or
+
 python3 ShoppingProgram.py
 
 You will be prompted to enter the product name to search.
