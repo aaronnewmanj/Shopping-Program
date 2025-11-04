@@ -1,6 +1,6 @@
 # eBay Product Scraper with SQL Database Storage
 
-This program fetches product listings from eBay using your secure server-side eBay API token, and stores them in a MySQL database. Users can configure their own database without needing access to the eBay API credentials.
+This is a Python based eBay product scraper that fetches desired product details, organizes them by price or seller rating, and stores them in a MySQL database. The program leverages the official eBay API through a deployed token proxy server, ensuring that API credentials remain private. Built with a focus on secure API integration, database flexibility, and scalable design, it demonstrates practical use of Flask, REST APIs, and environment-based credential management. 
 
 # Setup Instructions
 1. Clone the repository
@@ -27,7 +27,9 @@ DB_NAME=ListingDatabase
 
 EBAY_TOKEN_PROXY_URL=https://shopping-program.onrender.com/get-ebay-token
 
+
 Note: Users do not need eBay API keys as the program uses a secure token proxy I created seperately.
+
 
 5. Run the program
 
@@ -36,6 +38,7 @@ python ShoppingProgram.py
 or
 
 python3 ShoppingProgram.py
+
 
 You will be prompted to enter the product name to search.
 Then you can choose how many products to fetch.
