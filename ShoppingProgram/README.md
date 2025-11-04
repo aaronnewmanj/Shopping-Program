@@ -12,7 +12,7 @@ cd Shopping-Program
 cd ShoppingProgram
 
 
-3. Install Dependencies
+2. Install Dependencies
 
 pip install -r requirements.txt
 
@@ -21,7 +21,7 @@ or
 pip3 install -r requirements.txt
 
 
-5. Configure Database
+3. Configure Database and eBay Token
 
 Create a .env file in the project folder (copy example below) and fill in your own database credentials:
 
@@ -39,7 +39,7 @@ EBAY_TOKEN_PROXY_URL=https://shopping-program.onrender.com/get-ebay-token
 Note: Users do not need eBay API keys as the program uses a secure token proxy I created seperately.
 
 
-5. Run the program
+4. Run the program
 
 python ShoppingProgram.py
 
