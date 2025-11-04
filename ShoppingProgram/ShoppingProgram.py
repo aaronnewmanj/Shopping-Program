@@ -173,7 +173,7 @@ def display_results(results):
         print("")
         print(f"#{i}")
         print(f"Title : {item[0]}")
-        print(f"Price : {item[1]}")
+        print(f"Price : ${item[1]}")
         print(f"SellerRating: {item[2]}")
         print(f"Link  : {item[3]}")
         print("")
