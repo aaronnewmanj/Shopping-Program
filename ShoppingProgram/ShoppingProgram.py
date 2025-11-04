@@ -68,7 +68,7 @@ def get_ebay_app_token():
     """
     Requests an access token from the token proxy server.
     """
-    resp = requests.get(TOKEN_PROXY_URL, timeout=10)
+    resp = requests.get(TOKEN_PROXY_URL, timeout=60)
     resp.raise_for_status()
     return resp.json()["access_token"]
 
