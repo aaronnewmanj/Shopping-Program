@@ -1,4 +1,4 @@
-# eBay Product Scraper with SQL Database Storage
+# eBay API Product Scraper with SQL Database Storage
 
 This is a Python based eBay product scraper that fetches desired product details, organizes them by price or seller rating, and stores them in a MySQL database. The program leverages the official eBay API through a deployed token proxy server, ensuring that API credentials remain private. Built with a focus on secure API integration, database flexibility, and scalable design, it demonstrates practical use of Flask, REST APIs, and environment-based credential management. 
 
