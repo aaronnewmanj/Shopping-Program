@@ -23,7 +23,7 @@ pip3 install -r requirements.txt
 
 **3. Configure Database and eBay Token**
 
-Create a .env file in the project folder (copy example below) and fill in your own database credentials:
+Create a .env file in the project folder (copy example below) and fill in your own password:
 
 DB_HOST=127.0.0.1
 
